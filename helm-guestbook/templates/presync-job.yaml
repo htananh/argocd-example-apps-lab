@@ -1,0 +1,21 @@
+# 1.  In your repository fork, create a new manifest file under the `helm-guestbook` folder named `templates/presync-job.yaml`.
+# 2.  Define a standard Kubernetes `Job` resource in this new file.
+# 3.  The `Job`'s container should use a simple `busybox` image. Its command should print a message like "Running database migrations...", sleep for 10 seconds, and then exit successfully.
+# 4.  Add the `argocd.argoproj.io/hook: PreSync` annotation to the `Job`'s metadata to assign it to the PreSync phase.
+# 5.  Add the `argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded` annotation to ensure the job is cleaned up after success and can be re-run on subsequent syncs.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: presync-job
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: presync
+        image: busybox
+        command: ["sh", "-c", "echo Running database migrations...; sleep 10"]
+      restartPolicy: Never
